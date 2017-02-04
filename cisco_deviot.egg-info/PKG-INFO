@@ -1,0 +1,24 @@
+Metadata-Version: 1.1
+Name: cisco-deviot
+Version: 0.1.2
+Summary: Gateway SDK for Cisco DevIoT
+Home-page: https://github.com/CiscoDevIoT/gateway-python-sdk
+Author: Haihua Xiao
+Author-email: hhxiao@gmail.com
+License: Apache 2.0
+Description: #gateway-python-sdk
+        
+        Python SDK for DevIoT gateway service
+        
+Keywords: cisco devnet deviot gateway
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
