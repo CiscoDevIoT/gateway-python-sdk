@@ -32,11 +32,15 @@ class Gateway:
         self.name = name
         self.kind = kind
         self.owner = account
+        if urlparse(deviot_server).scheme == '':
+            deviot_server = "https://" + deviot_server
         self.deviot_server = urlparse(deviot_server)
         self.mode = MODE_MQTT
         self.things = {}
         self.__registration_started = False
         self.__registered = 0
+        if urlparse(connector_server).scheme == '':
+            connector_server = "tcp://" + connector_server
         self.connector = MqttConnector(self, connector_server)
         self.host = self.connector.host
         self.port = self.connector.port
@@ -75,7 +79,10 @@ class Gateway:
                                          ("sensors", [thing.get_model() for thing in self.things.values()])])
         json_string = json.dumps(self.__del_none(model), sort_keys=False)
         try:
-            conn = httplib.HTTPConnection(self.deviot_server.netloc)
+            if self.deviot_server.scheme == 'http':
+                conn = httplib.HTTPConnection(self.deviot_server.netloc)
+            else:
+                conn = httplib.HTTPSConnection(self.deviot_server.netloc)
             conn.request("POST", "/api/v1/gateways", json_string, {'Content-Type': 'application/json'})
             response = conn.getresponse()
             code = int(response.status)
