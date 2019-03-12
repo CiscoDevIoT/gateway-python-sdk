@@ -195,10 +195,18 @@ the kind of a thing
 
 #### add_property()
 ```
-
+add_property(*thing_properties)
 ```
-
-
+The add_property() adds properties to a Thing instance. When a string is used for arguments, new Property instance named the string is added to the Thing instance.
+**\*thing_properties**
+The list of Property instances or the string value of properties' name.
+#### add_action()
+```
+add_action(*thing_actions)
+```
+The add_action() adds actions to a Thing instance. When a string is used for arguments, new Action instance named the string is added to the Thing instance.
+**\*thing_properties**
+The list of Property instances or the string value of actions' name.
 ### Property
 #### Constructor
 ```
@@ -208,7 +216,7 @@ The Property() constructor takes the following arguments:
 **name**
 The name of a property. It should be unique in a thing.
 **type**
-The variable type of a property. There are 4 types: int, bool, string, color. You can use PropertyTypeInt, PropertyTypeBool, PropertyTypeString, and PropertyTypeColor.
+The variable type of a property. There are 4 types: int, bool, string, color. You can use constants.PROPERTY_TYPE_INT, constants.PROPERTY_TYPE_BOOL, constants.PROPERTY_TYPE_STRING, constants.PROPERTY_TYPE_COLOR after importing constants.
 **value**
 The value of a property. 
 **range**
