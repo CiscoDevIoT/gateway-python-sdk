@@ -32,14 +32,14 @@ class Gateway:
         self.name = name
         self.kind = kind
         self.owner = account
-        if urlparse(deviot_server).scheme == '':
+        if urlparse(deviot_server).scheme == '': # the default protocol for a DevIot server is HTTPS
             deviot_server = "https://" + deviot_server
         self.deviot_server = urlparse(deviot_server)
         self.mode = MODE_MQTT
         self.things = {}
         self.__registration_started = False
         self.__registered = 0
-        if urlparse(connector_server).scheme == '':
+        if urlparse(connector_server).scheme == '': # the default protocol of MQTT is TCP
             connector_server = "tcp://" + connector_server
         self.connector = MqttConnector(self, connector_server)
         self.host = self.connector.host
@@ -144,6 +144,7 @@ class Gateway:
         else:
             logger.warn("{connector} not connected yet".format(connector=self.connector))
 
+    # args: payload of the subscribed MQTT message
     def call_action(self, args):
         tid = None
         if "id" in args:
@@ -165,7 +166,7 @@ class Gateway:
             action = args.pop("action")
             try:
                 t.call_action(action, args)
-            except Exception, error:
+            except Exception as error:
                 logger.error("failed to call {tid}.{action}({args}): {error}".format(tid=tid,
                                                                                      action=action,
                                                                                      args=args,

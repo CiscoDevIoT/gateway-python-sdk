@@ -36,6 +36,8 @@ class Property:
     def __init__(self, name, type=0, value=None, range=None, unit=None, description=None):
         self.name = name
         self.type = type
+        if value is None:
+            value = default_value_for_type(type)
         self.value = value
         self.range = range
         self.unit = unit
@@ -110,6 +112,7 @@ class Thing:
                 logger.error("invalid property {property}, only string and Property are supported".format(property=act))
         return self
 
+    # method: action name
     def call_action(self, method, args):
         action_method = getattr(self, method)
         matches = list(a for a in self.actions if a.name == method)

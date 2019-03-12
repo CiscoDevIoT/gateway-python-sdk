@@ -36,6 +36,8 @@ class MqttConnector:
         surl = urlparse(mqtt_server)
         self.host = surl.hostname
         self.port = surl.port
+        if self.port is None:
+            self.port = 1883
         self.data = "/deviot/{ns}/{name}/data".format(name=name, ns=ns)
         self.action = "/deviot/{ns}/{name}/action".format(name=name, ns=ns)
 
@@ -48,6 +50,9 @@ class MqttConnector:
         self.client.disconnect()
 
     def __on_connect__(self, client, userdata, flags, rc):
+        if rc != 0:
+            logger.error("mqtt connection bad returned code={code}".format(code=rc))
+            self.__reconnect(2)
         self.client.subscribe(self.action)
         self.__connected = True
         logger.info("{server}{topic} connected".format(server=self, topic=self.action))
@@ -55,8 +60,10 @@ class MqttConnector:
     def __on_disconnect__(self, client, userdata, rc):
         logger.warn("{server} disconnected".format(server=self))
         self.__connected = False
-        backoff = 2
-        while not self.__connected:
+        self.__reconnect(2)
+
+    def __reconnect(self, backoff):
+        while not self.is_connected():
             logger.info("reconnecting to {server} in {sec} seconds ...".format(server=self, sec=backoff))
             time.sleep(backoff)
             backoff = min(128, backoff * 2)
@@ -74,7 +81,7 @@ class MqttConnector:
         try:
             args = json.loads(message)
             self.gateway.call_action(args)
-        except Exception, error:
+        except Exception as error:
             logger.error("failed to process message {message}: {error}".format(message=message, error=error))
 
     def publish(self, data):
