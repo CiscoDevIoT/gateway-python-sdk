@@ -12,6 +12,7 @@
 
 
 import json
+import threading
 from urlparse import urlparse
 
 import time
@@ -28,6 +29,7 @@ class MqttConnector:
         self.client.on_disconnect = self.__on_disconnect__
         self.client.on_message = self.__on_message__
         self.__connected = False
+        self.__connection_start = False
         ns = gateway.owner.replace("@", "_").replace(".", "_").replace("/", "_")
         if ns == "":
             ns = "_"
@@ -37,16 +39,27 @@ class MqttConnector:
         self.host = surl.hostname
         self.port = surl.port
         if self.port is None:
-            self.port = 1883
+            self.port = 1883 # The default port number
         self.data = "/deviot/{ns}/{name}/data".format(name=name, ns=ns)
         self.action = "/deviot/{ns}/{name}/action".format(name=name, ns=ns)
+
+    def __publish_function(self):
+        while self.__connection_start:
+            if self.is_connected():
+                self.publish(self.gateway.get_data())
+            time.sleep(0.5)
 
     def start(self):
         self.client.connect_async(self.host, self.port, 60)
         self.client.loop_start()
+        self.__connection_start = True
+        thread = threading.Thread(target=MqttConnector.__publish_function, args=(self,))
+        thread.daemon = True
+        thread.start()
         logger.info("connecting to {server} ...".format(server=self))
 
     def stop(self):
+        self.__connection_start = False
         self.client.disconnect()
 
     def __on_connect__(self, client, userdata, flags, rc):

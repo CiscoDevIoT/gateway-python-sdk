@@ -51,6 +51,9 @@ class Property:
                                         ("unit", self.unit),
                                         ("description", self.description)])
 
+    def __str__(self):
+        return "{name}:{value}{unit}".format(name=self.name, value=self.value, unit=self.unit)
+
 
 class Action:
     def __init__(self, name, **kwargs):
@@ -90,10 +93,13 @@ class Thing:
     def __str__(self):
         return "{id}.{name}({kind})".format(id=self.id, name=self.name, kind=self.kind)
 
+    def get_data(self):
+        return {prop.name: prop.value for prop in self.properties}
+
     def add_property(self, *thing_properties):
         for prop in thing_properties:
             if isinstance(prop, str):
-                self.properties.append(Property(prop, PropertyTypeInt))
+                self.properties.append(Property(prop))
             elif isinstance(prop, Property):
                 self.properties.append(prop)
             else:
@@ -101,6 +107,13 @@ class Thing:
                     "invalid property {property}, only string and Property are supported".format(property=prop))
 
         return self
+
+    def update_property(self, **new_properties):
+        for new_prop_name in new_properties:
+            for prop in self.properties:
+                if new_prop_name == prop.name:
+                    prop.value = new_properties[new_prop_name]
+                    break
 
     def add_action(self, *thing_actions):
         for act in thing_actions:

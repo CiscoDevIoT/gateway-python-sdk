@@ -5,8 +5,8 @@ Python SDK for DevIoT gateway service
 You can use this SDK to register devices to DevIoT, and sync up data and actions between the devices and DevIoT.
 
 ## Requirement
-1. [Python 2.7](https://www.python.org/downloads/):This SDK base on the Python 2.7.10
-2. [paho-mqtt](https://eclipse.org/paho/clients/python/): this SDK use this library to build a MQTT client
+1. [Python 2.7](https://www.python.org/downloads/): This SDK base on the Python 2.7.10
+2. [paho-mqtt](https://eclipse.org/paho/clients/python/): This SDK use this library to build a MQTT client
 
 ## Usage
 1. You can use sample code to register GrovePi sensors and simulated sensors to DevIoT.
@@ -46,7 +46,8 @@ from cisco_deviot.thing import Property
 ```
 Construct a Gateway object
 ```
-app = Gateway("gateway_name", "deviot.cisco.com", "deviot.cisco.com:18883", "device", "deviot_id@cisco.com")
+account = "your_id@cisco.com"
+app = Gateway("gateway_name", "deviot.cisco.com", "deviot.cisco.com:18883", "device", account)
 ```
 
 Contruct a thing instance
@@ -58,6 +59,15 @@ Add a property to the thing
 ```
 property = Property("variable_name", PropertyTypeInt, 0)
 thing.add_property(property);
+```
+
+Add an action to the thing
+```
+thing.add_action("sameple_action")
+def custom_function():
+    print("action")
+
+thing.sameple_action = custom_function
 ```
 
 Register the sensor to the gateway
@@ -95,7 +105,7 @@ You also can do this follow [here](https://www.raspberrypi.org/documentation/ins
 4. Connect RaspberryPi with Display use the HDMI cables.
 
 #### Build the software environment
-5. Install the Python 2.7. Check the python version of RaspberryPi os. this sample code base on python2.7.3 or later. in most time, the RaspberryPi os have installed the python2.7.3 or later, if not, you can 
+5. Install the Python 2.7. Check the python version of RaspberryPi os. this sample code base on python 2.7.3 or later. in most time, the RaspberryPi os have installed the python 2.7.3 or later, if not, you can 
 install the python follow [here](https://www.raspberrypi.org/documentation/linux/software/python.md)
 
 6. Install GrovePi SDK.
@@ -118,3 +128,91 @@ Your SD card now has what it needs to start using the GrovePi!
     
         python Sample_Code_for_GrovePi_Sensor.py
 &nbsp;
+## API
+### Gateway
+#### Constructor
+```
+Gateway(name, deviot_server, connector_server, kind="device", account="")
+```
+The Gateway() constructor takes the following arguments:
+**name** 
+The unique name of a gateway
+**deviot_server**
+The address for the DevIoT server. It does not need to add the protocol. The default protocol is HTTPS(secure connection). The public DevIoT server address is 'deviot.cisco.com'
+**connector_server**
+The address for the MQTT server. It does not need to add the protcol. The default protocol is TCP(unsecure connection) and the default port number is 1883. The public MQTT server address is 'deviot.cisco.com:18883'
+**kind**
+The kind of a gateway
+**account**
+Your DevIoT account. you also can use empty string, it will let all account get the data of your gateway.
+#### register()
+```
+register(thing)
+```
+The register() function adds a thing to the gateway. The thing should not have been already registered.
+**thing**
+A *Thing* instance to register
+#### deregister()
+```
+deregister(thing)
+```
+The deregister() function deletes a thing from the gateway.
+**thing**
+A *Thing* instance to deregister
+#### update_thing()
+```
+update_thing(thing_id, **new_value)
+```
+The update_thing() function updates the values of a thing.
+**thing_id**
+The id of the thing to be updated
+**\*\*new_value**
+The keyword arguments for the updated values. The key is the name of properties and the value is the new value.
+
+#### start()
+```
+start()
+```
+Connect the things of the gateway to the DevIoT server and the MQTT server
+#### stop()
+```
+stop()
+```
+Disconnect the gateway from the DevIoT server and the MQTT server.
+### Thing
+#### Constructor
+```
+Thing(id, name, kind=None)
+```
+The Thing() constructor takes the following arguments:
+**id**
+the unique id of a thing
+**name**
+the display name of a thing in DevIot
+**kind**
+the kind of a thing
+
+#### add_property()
+```
+
+```
+
+
+### Property
+#### Constructor
+```
+Property(name, type=0, value=None, range=None, unit=None, description=None)
+```
+The Property() constructor takes the following arguments:
+**name**
+The name of a property. It should be unique in a thing.
+**type**
+The variable type of a property. There are 4 types: int, bool, string, color. You can use PropertyTypeInt, PropertyTypeBool, PropertyTypeString, and PropertyTypeColor.
+**value**
+The value of a property. 
+**range**
+The range of a property's value.
+**unit**
+The unit of a property. It is string value. 
+**description**
+The description for a property. It is shown at the page of each thing.

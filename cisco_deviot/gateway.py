@@ -138,11 +138,19 @@ class Gateway:
         else:
             logger.warn("thing {thing} is not registered".format(thing=thing))
 
+    def get_data(self):
+        return {key: value.get_data() for (key, value) in self.things.items()}
+
     def send_data(self, data):
         if self.connector.is_connected:
             self.connector.publish(data)
         else:
             logger.warn("{connector} not connected yet".format(connector=self.connector))
+
+    def update_thing(self, thing_id, **new_values):
+        if thing_id in self.things:
+            thing = self.things[thing_id]
+            thing.update_property(**new_values)
 
     # args: payload of the subscribed MQTT message
     def call_action(self, args):
