@@ -43,6 +43,7 @@ Import SDK
 from cisco_deviot.gateway import Gateway
 from cisco_deviot.thing import Thing
 from cisco_deviot.thing import Property
+import constants
 ```
 Construct a Gateway object
 ```
@@ -57,7 +58,7 @@ thing = Thing("thing-id", "thing-name", "thing-kind")
 
 Add a property to the thing
 ```
-property = Property("variable_name", PropertyTypeInt, 0)
+property = Property("variable_name", constants.PROPERTY_TYPE_INT, 0)
 thing.add_property(property);
 ```
 

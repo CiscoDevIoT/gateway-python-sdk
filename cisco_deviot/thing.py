@@ -13,27 +13,23 @@
 import collections
 
 from cisco_deviot import logger
-
-PropertyTypeInt = 0
-PropertyTypeString = 1
-PropertyTypeBool = 2
-PropertyTypeColor = 3
+import constants
 
 
 def default_value_for_type(stype):
-    if stype == PropertyTypeInt:
+    if stype == constants.PROPERTY_TYPE_INT:
         return 0
-    if stype == PropertyTypeBool:
+    if stype == constants.PROPERTY_TYPE_BOOL:
         return False
-    if stype == PropertyTypeString:
+    if stype == constants.PROPERTY_TYPE_STRING:
         return ""
-    if stype == PropertyTypeColor:
+    if stype == constants.PROPERTY_TYPE_COLOR:
         return "FFFFFF"
     return None
 
 
 class Property:
-    def __init__(self, name, type=0, value=None, range=None, unit=None, description=None):
+    def __init__(self, name, type=constants.PROPERTY_TYPE_INT, value=None, range=None, unit=None, description=None):
         self.name = name
         self.type = type
         if value is None:
