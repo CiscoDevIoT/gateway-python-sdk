@@ -135,39 +135,39 @@ Your SD card now has what it needs to start using the GrovePi!
 ```
 Gateway(name, deviot_server, connector_server, kind="device", account="")
 ```
-The Gateway() constructor takes the following arguments:
-**name** 
-The unique name of a gateway
-**deviot_server**
-The address for the DevIoT server. It does not need to add the protocol. The default protocol is HTTPS(secure connection). The public DevIoT server address is 'deviot.cisco.com'
-**connector_server**
-The address for the MQTT server. It does not need to add the protcol. The default protocol is TCP(unsecure connection) and the default port number is 1883. The public MQTT server address is 'deviot.cisco.com:18883'
-**kind**
-The kind of a gateway
-**account**
+The Gateway() constructor takes the following arguments:  
+**name**  
+The unique name of a gateway  
+**deviot_server**  
+The address for the DevIoT server. It does not need to add the protocol. The default protocol is HTTPS(secure connection). The public DevIoT server address is 'deviot.cisco.com'  
+**connector_server**  
+The address for the MQTT server. It does not need to add the protcol. The default protocol is TCP(unsecure connection) and the default port number is 1883. The public MQTT server address is 'deviot.cisco.com:18883'  
+**kind**  
+The kind of a gateway  
+**account**  
 Your DevIoT account. you also can use empty string, it will let all account get the data of your gateway.
 #### register()
 ```
 register(thing)
 ```
-The register() function adds a thing to the gateway. The thing should not have been already registered.
-**thing**
+The register() function adds a thing to the gateway. The thing should not have been already registered.  
+**thing**  
 A *Thing* instance to register
 #### deregister()
 ```
 deregister(thing)
 ```
-The deregister() function deletes a thing from the gateway.
-**thing**
+The deregister() function deletes a thing from the gateway.  
+**thing**  
 A *Thing* instance to deregister
 #### update_thing()
 ```
 update_thing(thing_id, **new_value)
 ```
-The update_thing() function updates the values of a thing.
-**thing_id**
-The id of the thing to be updated
-**\*\*new_value**
+The update_thing() function updates the values of a thing.  
+**thing_id**  
+The id of the thing to be updated  
+**\*\*new_value**  
 The keyword arguments for the updated values. The key is the name of properties and the value is the new value.
 
 #### start()
@@ -185,43 +185,44 @@ Disconnect the gateway from the DevIoT server and the MQTT server.
 ```
 Thing(id, name, kind=None)
 ```
-The Thing() constructor takes the following arguments:
-**id**
-the unique id of a thing
-**name**
-the display name of a thing in DevIot
-**kind**
+The Thing() constructor takes the following arguments:  
+**id**  
+the unique id of a thing  
+**name**  
+the display name of a thing in DevIot  
+**kind**  
 the kind of a thing
 
 #### add_property()
 ```
 add_property(*thing_properties)
 ```
-The add_property() adds properties to a Thing instance. When a string is used for arguments, new Property instance named the string is added to the Thing instance.
-**\*thing_properties**
+The add_property() adds properties to a Thing instance. When a string is used for arguments, new Property instance named the string is added to the Thing instance.  
+**\*thing_properties**  
 The list of Property instances or the string value of properties' name.
 #### add_action()
 ```
 add_action(*thing_actions)
 ```
-The add_action() adds actions to a Thing instance. When a string is used for arguments, new Action instance named the string is added to the Thing instance.
-**\*thing_properties**
+The add_action() adds actions to a Thing instance. When a string is used for arguments, new Action instance named the string is added to the Thing instance.  
+**\*thing_properties**  
 The list of Property instances or the string value of actions' name.
+
 ### Property
 #### Constructor
 ```
 Property(name, type=0, value=None, range=None, unit=None, description=None)
 ```
-The Property() constructor takes the following arguments:
-**name**
-The name of a property. It should be unique in a thing.
-**type**
-The variable type of a property. There are 4 types: int, bool, string, color. You can use constants.PROPERTY_TYPE_INT, constants.PROPERTY_TYPE_BOOL, constants.PROPERTY_TYPE_STRING, constants.PROPERTY_TYPE_COLOR after importing constants.
-**value**
-The value of a property. 
-**range**
-The range of a property's value.
-**unit**
-The unit of a property. It is string value. 
-**description**
+The Property() constructor takes the following arguments:  
+**name**  
+The name of a property. It should be unique in a thing.  
+**type**  
+The variable type of a property. There are 4 types: int, bool, string, color. You can use constants.PROPERTY_TYPE_INT, constants.PROPERTY_TYPE_BOOL, constants.PROPERTY_TYPE_STRING, constants.PROPERTY_TYPE_COLOR after importing constants.  
+**value**  
+The value of a property.  
+**range**  
+The range of a property's value.  
+**unit**  
+The unit of a property. It is string value.  
+**description**  
 The description for a property. It is shown at the page of each thing.
