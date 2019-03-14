@@ -18,12 +18,10 @@ import json
 
 from urlparse import urlparse
 from cisco_deviot import logger
-from cisco_deviot.mqtt_connector import MqttConnector
+from mqtt_connector import MqttConnector
+from thing import Thing
 
-
-MODE_HTTP_PULL = 0
-MODE_HTTP_PUSH = 1
-MODE_MQTT = 2
+import constants
 
 
 class Gateway:
@@ -35,7 +33,7 @@ class Gateway:
         if urlparse(deviot_server).scheme == '': # the default protocol for a DevIot server is HTTPS
             deviot_server = "https://" + deviot_server
         self.deviot_server = urlparse(deviot_server)
-        self.mode = MODE_MQTT
+        self.mode = constants.MODE_MQTT
         self.things = {}
         self.__registration_started = False
         self.__registered = 0
@@ -124,19 +122,28 @@ class Gateway:
         else:
             logger.warn("gateway service {name} already stopped".format(name=self))
 
-    def register(self, thing):
-        if thing.id in self.things:
-            logger.warn("thing {thing} is already registered".format(thing=thing))
-        else:
-            self.things[thing.id] = thing
-            logger.info("thing {thing} registered".format(thing=thing))
 
-    def deregister(self, thing):
-        if thing.id in self.things:
-            del self.things[thing.id]
-            logger.info("thing {thing} deregistered".format(thing=thing))
-        else:
-            logger.warn("thing {thing} is not registered".format(thing=thing))
+    def register(self, *things):
+        for thing in things:
+            if not isinstance(thing, Thing):
+                logger.error("Invalid thing {thing}, only Thing instance is supported".format(thing=thing))
+                continue
+            if thing.id in self.things:
+                logger.warn("thing {thing} is already registered".format(thing=thing))
+            else:
+                self.things[thing.id] = thing
+                logger.info("thing {thing} registered".format(thing=thing))
+
+    def deregister(self, *things):
+        for thing in things:
+            if not isinstance(thing, Thing):
+                logger.error("Invalid thing {thing}, only Thing instance is supported".format(thing=thing))
+                continue
+            if thing.id in self.things:
+                del self.things[thing.id]
+                logger.info("thing {thing} deregistered".format(thing=thing))
+            else:
+                logger.warn("thing {thing} is not registered".format(thing=thing))
 
     def get_data(self):
         return {key: value.get_data() for (key, value) in self.things.items()}
@@ -147,10 +154,19 @@ class Gateway:
         else:
             logger.warn("{connector} not connected yet".format(connector=self.connector))
 
-    def update_thing(self, thing_id, **new_values):
+    def update_thing(self, thing, **new_values):
+        if isinstance(thing, str):
+            thing_id = thing
+        elif isinstance(thing, Thing):
+            thing_id = thing.id
+        else:
+            logger.error("Invalid thing {thing}, only string and Thing are supported".format(thing=thing))
+            return
         if thing_id in self.things:
             thing = self.things[thing_id]
             thing.update_property(**new_values)
+        else:
+            logger.warn("There is no thing with id {id}".format(id=thing_id))
 
     # args: payload of the subscribed MQTT message
     def call_action(self, args):

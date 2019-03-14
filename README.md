@@ -1,8 +1,14 @@
 # gateway-python-sdk
 
-Python SDK for DevIoT gateway service
+### Python SDK for DevIoT service ([https://deviot.cisco.com/](https://deviot.cisco.com/))
 
 You can use this SDK to register devices to DevIoT, and sync up data and actions between the devices and DevIoT.
+
+## Table of contents
+
+* [Getting Started](#getting-started)
+* [Run sample code on Raspberry Pi](#run-sample-code-on-raspberry-pi)
+* [API](#api)
 
 ## Requirement
 1. [Python 2.7](https://www.python.org/downloads/): This SDK base on the Python 2.7.10
@@ -14,7 +20,7 @@ You can use this SDK to register devices to DevIoT, and sync up data and actions
 
 ## Term
 
-- **Gateway**: 'Gateway' is a device connected to DevIoT like a raspberry pi board or a mobile phone
+- **Gateway**: 'Gateway' is a device connected to DevIoT like a Raspberry Pi board or a mobile phone
 - **Thing**: 'Thing' is a sensor or a module in a gateway like a light sensor, LED, or GPS. A thing is an icon in DevIoT. A gateway can have several things.
 - **Property**: 'Property' is a variable measured by a thing. For instance, Latitude and longitude are properties of a GPS. A thing can have several properties.
 - **Action**: 'Action' is a command for a module. For example, turning on and off LED are two different actions. A thing can have several actions.
@@ -27,7 +33,7 @@ python --version
 ```
 
 #### 1) Set up SDK package (terminal)
-copy SDK git repository
+Clone SDK git repository
 ```
 git clone https://wwwin-github.cisco.com/DevIoT/gateway-python-sdk.git
 cd gateway-pythohn-sdk
@@ -87,47 +93,51 @@ disconnect gateway
 app.stop()
 ```
 &nbsp;
-## How to run Sample_Code_for_GrovePi_Sensor.py
+## Run sample code on Raspberry Pi
 #### Build the hardware
-1. Prepare your RaspberryPi os environment in your SD card
-
-* Download the OS for RaspberryPi form here[RASPBIAN JESSIE](https://www.raspberrypi.org/downloads/raspbian/)
+###### 1. Prepare your Raspberry Pi os environment in your SD card
+* Download the OS for Raspberry Pi form [RASPBIAN JESSIE](https://www.raspberrypi.org/downloads/raspbian/)
 * Format you SD card
-* Use window install the OS image to the SD card. you can use [Win32 Disk Manager](https://sourceforge.net/projects/win32diskimager/) do this 
-    I strongly recommend you do this use windows, i have met many issues when i installed it by mac os
-* Attach the SD card to the RaspberryPi
+* Use window install the OS image to the SD card. you can use [Win32 Disk Manager](https://sourceforge.net/projects/win32diskimager/).
+    I strongly recommend you do this using Windows, I have met many issues when i installed it by mac OS
+* Attach the SD card to the Raspberry Pi
 
-You also can do this follow [here](https://www.raspberrypi.org/documentation/installation/noobs.md)
+You also can follow [this instructions](https://www.raspberrypi.org/documentation/installation/noobs.md)
 
-2. Join the GrovePi with RaspberryPi. if you correct, it should be like this
+######2. Connect the GrovePi to the Raspberry Pi.
 
-3. Connect RaspberryPi with the power and network.
+######3. Connect Raspberry Pi with the power and network.
 
-4. Connect RaspberryPi with Display use the HDMI cables.
+######4. Connect Raspberry Pi with Display using HDMI cable.
 
 #### Build the software environment
-5. Install the Python 2.7. Check the python version of RaspberryPi os. this sample code base on python 2.7.3 or later. in most time, the RaspberryPi os have installed the python 2.7.3 or later, if not, you can 
-install the python follow [here](https://www.raspberrypi.org/documentation/linux/software/python.md)
+######5. Install the Python 2.7. 
+* Check the version of python that Raspberry Pi has. This sample code is based on python 2.7.3 or later. in most time, the Raspberry Pi os have installed the python 2.7.3 or later, if not, you can install the python follow [here](https://www.raspberrypi.org/documentation/linux/software/python.md)
 
-6. Install GrovePi SDK.
+######6. Install GrovePi SDK.
 
-* Make sure your Raspberry Pi is connected to the internet. 
-* Type follow command in terminal window
+* Make sure your Raspberry Pi is connected to the Internet. 
+* Type the following commands in terminal window
     
         sudo apt-get update
         sudo apt-get install rpi.gpio
     
-* [Follow this tutorial for setting up the GrovePi](http://www.dexterindustries.com/GrovePi/get-started-with-the-grovepi/setting-software/).
-* Restart the Raspberry Pi.
+* [Follow the tutorial for setting up the GrovePi](http://www.dexterindustries.com/GrovePi/get-started-with-the-grovepi/setting-software/).
+* Reboot your Raspberry Pi board.
     
-Your SD card now has what it needs to start using the GrovePi!
-[Here is info more about install GrovePi SDK](http://www.dexterindustries.com/GrovePi/get-started-with-the-grovepi/)
+Your SD card now has what it needs to start using the GrovePi.
+[More information about installing GrovePi SDK](http://www.dexterindustries.com/GrovePi/get-started-with-the-grovepi/)
 
-#### Run Grove Pi sample
-* Cd to your work space in terminal window
-* Type follow command:
-    
-        python Sample_Code_for_GrovePi_Sensor.py
+#### Run GrovePi sample code
+
+######7. Download SDK and run the sample code
+* Download SDK and go to the main directory of the repo
+
+        git clone https://wwwin-github.cisco.com/DevIoT/gateway-python-sdk.git
+        cd gateway-pythohn-sdk
+* Run the sample python code
+        
+        python sample_code_for_GrovePi_sensor.py
 &nbsp;
 ## API
 ### Gateway
@@ -148,25 +158,25 @@ The kind of a gateway
 Your DevIoT account. you also can use empty string, it will let all account get the data of your gateway.
 #### register()
 ```
-register(thing)
+register(*things)
 ```
-The register() function adds a thing to the gateway. The thing should not have been already registered.  
+The register() function adds things to the gateway. The thing should not have been already registered.
 **thing**  
 A *Thing* instance to register
 #### deregister()
 ```
-deregister(thing)
+deregister(*things)
 ```
-The deregister() function deletes a thing from the gateway.  
+The deregister() function deletes things from the gateway.  
 **thing**  
 A *Thing* instance to deregister
 #### update_thing()
 ```
-update_thing(thing_id, **new_value)
+update_thing(thing, **new_value)
 ```
 The update_thing() function updates the values of a thing.  
-**thing_id**  
-The id of the thing to be updated  
+**thing**  
+The thing to be updated. It can be the string id of a thing or a Thing instance.  
 **\*\*new_value**  
 The keyword arguments for the updated values. The key is the name of properties and the value is the new value.
 
