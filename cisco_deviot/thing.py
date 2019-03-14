@@ -118,7 +118,7 @@ class Thing:
             elif isinstance(act, Action):
                 self.actions.append(act)
             else:
-                logger.error("invalid property {property}, only string and Property are supported".format(property=act))
+                logger.error("invalid action {action}, only string and Action are supported".format(action=act))
         return self
 
     # method: action name
