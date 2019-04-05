@@ -117,6 +117,16 @@ register(*things)
 The register() function adds things to the gateway. The thing should not have been already registered.
 **thing**  
 A *Thing* instance to register
+#### load()
+```
+load(filename, class_directory=None)
+```
+The load() function registers things from an JSON file named [filename] and the custom Thing-sub classes inside [class_directory].
+**filename**
+The JSON file having information of things. filename should include its extension. The way to write this JSON file is described in **gateway-python-starter-kit**.
+**class_directory**
+The directory which has custom Thing-sub class. If the Thing-sub class is defined in the same directory, class_directory should be omitted or be None.
+
 #### deregister()
 ```
 deregister(*things)

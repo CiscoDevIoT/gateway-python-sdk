@@ -141,6 +141,37 @@ class Gateway:
                 self.things[thing.id] = thing
                 logger.info("thing {thing} registered".format(thing=thing))
 
+    # load JSON file 'filename' and register instances of custom Thing class which are defined in 'class_directory'
+    def load(self, filename, class_directory=None):
+        try:
+            with open(filename) as json_data:
+                things = json.load(json_data)
+        except IOError:
+            logger.error("Cannot open such file: {file}".format(file=filename))
+            return
+
+        for i, thing in enumerate(things):
+            name = str(thing.get("name", ""))
+            if name == "":
+                logger.error("There is no sensor name")
+                continue
+            stype = str(thing.get("type", "thing"))
+            sid = stype + "_" + name + "-" + str(i)
+            if stype == 'thing':
+                c = Thing
+            else:
+                try:
+                    class_name = stype if (class_directory is None) else (class_directory + "." + stype)
+                    m = importlib.import_module(class_name)
+                    c = getattr(m, stype.capitalize())
+                except:
+                    logger.error("There is no Thing class called {name}".format(name=class_name)) 
+                    continue
+            instance = c(sid, name)
+            if "options" in thing:
+                instance.options = thing["options"]
+            self.register(instance)
+
     def deregister(self, *things):
         for thing in things:
             if not isinstance(thing, Thing):
