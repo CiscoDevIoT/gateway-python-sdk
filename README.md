@@ -11,8 +11,8 @@ You can use this SDK to register devices to DevIoT, and sync up data and actions
 * [API](#api)
 
 ## Requirement
-1. [Python 2.7](https://www.python.org/downloads/): This SDK base on the Python 2.7.10
-2. [paho-mqtt](https://eclipse.org/paho/clients/python/): This SDK use this library to build a MQTT client
+1. [Python 2.7](https://www.python.org/downloads/): This SDK is based on the Python 2.7.3
+2. [paho-mqtt](https://eclipse.org/paho/clients/python/): This SDK uses this library to build a MQTT client
 
 ## Usage
 1. You can use sample code to register GrovePi sensors and simulated sensors to DevIoT.
@@ -92,52 +92,6 @@ disconnect gateway
 ```
 app.stop()
 ```
-&nbsp;
-## Run sample code on Raspberry Pi
-#### Build the hardware
-###### 1. Prepare your Raspberry Pi os environment in your SD card
-* Download the OS for Raspberry Pi form [RASPBIAN JESSIE](https://www.raspberrypi.org/downloads/raspbian/)
-* Format you SD card
-* Use window install the OS image to the SD card. you can use [Win32 Disk Manager](https://sourceforge.net/projects/win32diskimager/).
-    I strongly recommend you do this using Windows, I have met many issues when i installed it by mac OS
-* Attach the SD card to the Raspberry Pi
-
-You also can follow [this instructions](https://www.raspberrypi.org/documentation/installation/noobs.md)
-
-######2. Connect the GrovePi to the Raspberry Pi.
-
-######3. Connect Raspberry Pi with the power and network.
-
-######4. Connect Raspberry Pi with Display using HDMI cable.
-
-#### Build the software environment
-######5. Install the Python 2.7. 
-* Check the version of python that Raspberry Pi has. This sample code is based on python 2.7.3 or later. in most time, the Raspberry Pi os have installed the python 2.7.3 or later, if not, you can install the python follow [here](https://www.raspberrypi.org/documentation/linux/software/python.md)
-
-######6. Install GrovePi SDK.
-
-* Make sure your Raspberry Pi is connected to the Internet. 
-* Type the following commands in terminal window
-    
-        sudo apt-get update
-        sudo apt-get install rpi.gpio
-    
-* [Follow the tutorial for setting up the GrovePi](http://www.dexterindustries.com/GrovePi/get-started-with-the-grovepi/setting-software/).
-* Reboot your Raspberry Pi board.
-    
-Your SD card now has what it needs to start using the GrovePi.
-[More information about installing GrovePi SDK](http://www.dexterindustries.com/GrovePi/get-started-with-the-grovepi/)
-
-#### Run GrovePi sample code
-
-######7. Download SDK and run the sample code
-* Download SDK and go to the main directory of the repo
-
-        git clone https://wwwin-github.cisco.com/DevIoT/gateway-python-sdk.git
-        cd gateway-pythohn-sdk
-* Run the sample python code
-        
-        python sample_code_for_GrovePi_sensor.py
 &nbsp;
 ## API
 ### Gateway
@@ -227,7 +181,7 @@ The Property() constructor takes the following arguments:
 **name**  
 The name of a property. It should be unique in a thing.  
 **type**  
-The variable type of a property. There are 4 types: int, bool, string, color. You can use constants.PROPERTY_TYPE_INT, constants.PROPERTY_TYPE_BOOL, constants.PROPERTY_TYPE_STRING, constants.PROPERTY_TYPE_COLOR after importing constants.  
+The variable type of a property. There are 4 types: int, bool, string, color. You can use PropertyType.INT, PropertyType.BOOL, PropertyType.STRING, PropertyType.COLOR after importing 'PropertyType' class from 'cisco_deviot.thing'.  
 **value**  
 The value of a property.  
 **range**  

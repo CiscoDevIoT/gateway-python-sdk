@@ -13,23 +13,31 @@
 import collections
 
 from cisco_deviot import logger
+from enum import EnumMeta
 import constants
 
 
 def default_value_for_type(stype):
-    if stype == constants.PROPERTY_TYPE_INT:
+    if stype == PropertyType.INT:
         return 0
-    if stype == constants.PROPERTY_TYPE_BOOL:
+    if stype == PropertyType.BOOL:
         return False
-    if stype == constants.PROPERTY_TYPE_STRING:
+    if stype == PropertyType.STRING:
         return ""
-    if stype == constants.PROPERTY_TYPE_COLOR:
+    if stype == PropertyType.COLOR:
         return "FFFFFF"
     return None
 
 
+class PropertyType(EnumMeta):
+    INT = 0
+    STRING = 1
+    BOOL = 2
+    COLOR = 3
+
+
 class Property:
-    def __init__(self, name, type=constants.PROPERTY_TYPE_INT, value=None, range=None, unit=None, description=None):
+    def __init__(self, name, type=PropertyType.INT, value=None, range=None, unit=None, description=None):
         self.name = name
         self.type = type
         if value is None:
@@ -92,23 +100,31 @@ class Thing:
     def get_data(self):
         return {prop.name: prop.value for prop in self.properties}
 
+    # check the property, of which name is 'prop', is in properies
+    def _has_property(self, prop):
+        return (prop in [property.name for property in self.properties])
+
     def add_property(self, *thing_properties):
-        for prop in thing_properties:
-            if isinstance(prop, str):
-                self.properties.append(Property(prop))
-            elif isinstance(prop, Property):
-                self.properties.append(prop)
+        for property in thing_properties: 
+            if isinstance(property, str):
+                added_property = Property(property)
+            elif isinstance(property, Property):
+                added_property = property
             else:
-                logger.error(
-                    "invalid property {property}, only string and Property are supported".format(property=prop))
+                logger.error("invalid property {property}, only string and Property are supported".format(property=property))
+                continue
+            if self._has_property(added_property.name):
+                logger.error("Invalid property name {property}, already registered.".format(property=added_property.name))
+                break
+            self.properties.append(property)
 
         return self
 
     def update_property(self, **new_properties):
         for new_prop_name in new_properties:
-            for prop in self.properties:
-                if new_prop_name == prop.name:
-                    prop.value = new_properties[new_prop_name]
+            for existing_prop in self.properties:
+                if new_prop_name == existing_prop.name:
+                    existing_prop.value = new_properties[new_prop_name]
                     break
 
     def add_action(self, *thing_actions):

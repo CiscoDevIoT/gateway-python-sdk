@@ -6,6 +6,7 @@ requirements.txt
 setup.cfg
 setup.py
 cisco_deviot/__init__.py
+cisco_deviot/constants.py
 cisco_deviot/gateway.py
 cisco_deviot/mqtt_connector.py
 cisco_deviot/thing.py

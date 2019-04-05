@@ -15,13 +15,19 @@ import httplib
 import threading
 import time
 import json
+import importlib
 
 from urlparse import urlparse
 from cisco_deviot import logger
 from mqtt_connector import MqttConnector
 from thing import Thing
 
-import constants
+from enum import EnumMeta
+
+class Mode(EnumMeta):
+    HTTP_PULL = 0
+    HTTP_PUSH = 1
+    MQTT = 2
 
 
 class Gateway:
@@ -33,7 +39,7 @@ class Gateway:
         if urlparse(deviot_server).scheme == '': # the default protocol for a DevIot server is HTTPS
             deviot_server = "https://" + deviot_server
         self.deviot_server = urlparse(deviot_server)
-        self.mode = constants.MODE_MQTT
+        self.mode = Mode.MQTT
         self.things = {}
         self.__registration_started = False
         self.__registered = 0
@@ -104,7 +110,7 @@ class Gateway:
             self.__registered = 1
 
     def start(self):
-        if self.__registration_started:
+        if self.is_started():
             logger.warn("gateway service {name} already started".format(name=self))
         else:
             self.__registration_started = True
@@ -115,20 +121,21 @@ class Gateway:
             logger.info("gateway service {name} started".format(name=self))
 
     def stop(self):
-        if self.__registration_started:
+        if self.is_started():
             self.__registration_started = False
             self.connector.stop()
             logger.info("gateway service {name} stopped".format(name=self))
         else:
             logger.warn("gateway service {name} already stopped".format(name=self))
 
+    def is_started(self):
+        return self.__registration_started
 
     def register(self, *things):
         for thing in things:
             if not isinstance(thing, Thing):
                 logger.error("Invalid thing {thing}, only Thing instance is supported".format(thing=thing))
-                continue
-            if thing.id in self.things:
+            elif thing.id in self.things:
                 logger.warn("thing {thing} is already registered".format(thing=thing))
             else:
                 self.things[thing.id] = thing

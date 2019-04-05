@@ -46,7 +46,9 @@ class MqttConnector:
     def __publish_function(self):
         while self.__connection_start:
             if self.is_connected():
-                self.publish(self.gateway.get_data())
+                data = self.gateway.get_data()
+                if len(data) != 0:
+                    self.publish(data)
             time.sleep(0.5)
 
     def start(self):
