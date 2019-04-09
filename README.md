@@ -35,8 +35,8 @@ python --version
 #### 1) Set up SDK package (terminal)
 Clone SDK git repository
 ```
-git clone https://wwwin-github.cisco.com/DevIoT/gateway-python-sdk.git
-cd gateway-pythohn-sdk
+git clone https://github.com/ailuropoda0/gateway-python-sdk.git
+cd gateway-python-sdk
 ```
 install sdk package on python 2 
 ```
@@ -44,17 +44,17 @@ python setup.py install
 ```
 
 #### 2) Connect gateway (python code)
+You can refer the example code in [gateway-python-starter-kit](https://wwwin-github.cisco.com/DevIoT/gateway-python-starter-kit).
+
 Import SDK
 ```
 from cisco_deviot.gateway import Gateway
-from cisco_deviot.thing import Thing
-from cisco_deviot.thing import Property
-import constants
+from cisco_deviot.thing import Thing, Property, PropertyType
 ```
 Construct a Gateway object
 ```
 account = "your_id@cisco.com"
-app = Gateway("gateway_name", "deviot.cisco.com", "deviot.cisco.com:18883", "device", account)
+app = Gateway(name="gateway_name", account=account)
 ```
 
 Contruct a thing instance
@@ -64,7 +64,7 @@ thing = Thing("thing-id", "thing-name", "thing-kind")
 
 Add a property to the thing
 ```
-property = Property("variable_name", constants.PROPERTY_TYPE_INT, 0)
+property = Property("variable_name", PropertyType.INT, 0)
 thing.add_property(property);
 ```
 
@@ -114,7 +114,7 @@ Your DevIoT account. you also can use empty string, it will let all account get 
 ```
 register(*things)
 ```
-The register() function adds things to the gateway. The thing should not have been already registered.
+The register() function adds things to the gateway. The thing should not have been already registered.  
 **thing**  
 A *Thing* instance to register
 #### load()
@@ -122,9 +122,9 @@ A *Thing* instance to register
 load(filename, class_directory=None)
 ```
 The load() function registers things from an JSON file named [filename] and the custom Thing-sub classes inside [class_directory].
-**filename**
-The JSON file having information of things. filename should include its extension. The way to write this JSON file is described in **gateway-python-starter-kit**.
-**class_directory**
+**filename**  
+The JSON file having information of things. filename should include its extension. The way to write this JSON file is described in **gateway-python-starter-kit**.  
+**class_directory**  
 The directory which has custom Thing-sub class. If the Thing-sub class is defined in the same directory, class_directory should be omitted or be None.
 
 #### deregister()
@@ -132,7 +132,7 @@ The directory which has custom Thing-sub class. If the Thing-sub class is define
 deregister(*things)
 ```
 The deregister() function deletes things from the gateway.  
-**thing**  
+**\*things**  
 A *Thing* instance to deregister
 #### update_thing()
 ```

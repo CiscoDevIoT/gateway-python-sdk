@@ -16,6 +16,7 @@ import threading
 import time
 import json
 import importlib
+import socket
 
 from urlparse import urlparse
 from cisco_deviot import logger
@@ -31,7 +32,7 @@ class Mode(EnumMeta):
 
 
 class Gateway:
-    def __init__(self, name, deviot_server, connector_server, kind="device", account=""):
+    def __init__(self, name, deviot_server="deviot.cisco.com", connector_server="deviot.cisco.com:18883", kind="device", account=""):
         name = name.replace("-", "_")
         self.name = name
         self.kind = kind
@@ -147,16 +148,16 @@ class Gateway:
             with open(filename) as json_data:
                 things = json.load(json_data)
         except IOError:
-            logger.error("Cannot open such file: {file}".format(file=filename))
+            logger.error("cannot open such file: {file}".format(file=filename))
             return
 
-        for i, thing in enumerate(things):
+        for thing in things:
+            stype = str(thing.get("type", "thing"))
             name = str(thing.get("name", ""))
             if name == "":
-                logger.error("There is no sensor name")
-                continue
-            stype = str(thing.get("type", "thing"))
-            sid = stype + "_" + name + "-" + str(i)
+                name = socket.gethostname() + "'s " + stype
+                logger.warn("There is no sensor name")
+            sid = name + "_" + str(int(time.time()))
             if stype == 'thing':
                 c = Thing
             else:
@@ -165,7 +166,7 @@ class Gateway:
                     m = importlib.import_module(class_name)
                     c = getattr(m, stype.capitalize())
                 except:
-                    logger.error("There is no Thing class called {name}".format(name=class_name)) 
+                    logger.error("error to import the class {name}".format(name=class_name)) 
                     continue
             instance = c(sid, name)
             if "options" in thing:
