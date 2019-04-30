@@ -2,12 +2,11 @@
 
 ### Python SDK for DevIoT service ([https://deviot.cisco.com/](https://deviot.cisco.com/))
 
-You can use this SDK to register devices to DevIoT, and sync up data and actions between the devices and DevIoT.
+You can use this SDK to register devices to DevIoT and sync up data and actions between the devices and DevIoT.
 
 ## Table of contents
 
 * [Getting Started](#getting-started)
-* [Run sample code on Raspberry Pi](#run-sample-code-on-raspberry-pi)
 * [API](#api)
 
 ## Requirement
@@ -97,15 +96,15 @@ app.stop()
 ### Gateway
 #### Constructor
 ```
-Gateway(name, deviot_server, connector_server, kind="device", account="")
+Gateway(name, deviot_server="deviot.cisco.com", connector_server="deviot.cisco.com:18883", kind="device", account="")
 ```
 The Gateway() constructor takes the following arguments:  
 **name**  
 The unique name of a gateway  
 **deviot_server**  
-The address for the DevIoT server. It does not need to add the protocol. The default protocol is HTTPS(secure connection). The public DevIoT server address is 'deviot.cisco.com'  
+The address for the DevIoT server. The default value is 'deviot.cisco.com'. It does not need to add the protocol. The default protocol is HTTPS(secure connection).  
 **connector_server**  
-The address for the MQTT server. It does not need to add the protcol. The default protocol is TCP(unsecure connection) and the default port number is 1883. The public MQTT server address is 'deviot.cisco.com:18883'  
+The address for the MQTT server. The default value is 'deviot.cisco.com:18883'. It does not need to add the protcol. The default protocol is TCP(unsecure connection) and the default port number is 1883.  
 **kind**  
 The kind of a gateway  
 **account**  
@@ -200,3 +199,22 @@ The range of a property's value.
 The unit of a property. It is string value.  
 **description**  
 The description for a property. It is shown at the page of each thing.
+
+### Action
+#### Constructor
+```
+Action(name, **kwargs)
+```
+The Action() constructor takes the following arguments:  
+**name**  
+The name of Action. The method with the same name should be defined in a class or an instance. So the name must not overlap with other methods of Thing class like *add_property* and *add_action, and the name cannot contain space ' '.  
+**\*\*kwargs**  
+The keyword arguments for properties in an action. Key is the name of a property and the value of the property. It is not mandatory.
+
+#### add_parameter()
+```
+add_parameter(action_parameter)
+```
+The *add_parameter* adds properties to an Action instance.  
+**action_parameter**  
+A Property instance to be added
