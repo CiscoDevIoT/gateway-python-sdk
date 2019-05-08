@@ -38,8 +38,8 @@ class MqttConnector:
         surl = urlparse(mqtt_server)
         self.host = surl.hostname
         self.port = surl.port
-        if self.port is None:
-            self.port = 1883 # The default port number
+        if self.port is None: # The default MQTT port number is 1883
+            self.port = 1883
         self.data = "/deviot/{ns}/{name}/data".format(name=name, ns=ns)
         self.action = "/deviot/{ns}/{name}/action".format(name=name, ns=ns)
 

@@ -14,8 +14,8 @@ You can use this SDK to register devices to DevIoT and sync up data and actions 
 2. [paho-mqtt](https://eclipse.org/paho/clients/python/): This SDK uses this library to build a MQTT client
 
 ## Usage
-1. You can use sample code to register GrovePi sensors and simulated sensors to DevIoT.
-2. You can also use SDK to register other sensors and systems to DevIoT.
+1. You can use SDK to register your own sensors and systems to DevIoT.
+2. Use [Starter-ki](https://wwwin-github.cisco.com/DevIoT/gateway-python-starter-kit) to run sample codes
 
 ## Term
 
@@ -52,7 +52,7 @@ from cisco_deviot.thing import Thing, Property, PropertyType
 ```
 Construct a Gateway object
 ```
-account = "your_id@cisco.com"
+account = "your_id@cisco.com" # enter your DevIoT account
 app = Gateway(name="gateway_name", account=account)
 ```
 
@@ -60,14 +60,16 @@ Contruct a thing instance
 ```
 thing = Thing("thing-id", "thing-name", "thing-kind")
 ```
+You can only use Thing as either an input component(sensor) or an output component.
+If your thing has both properties and actions, it acts as an input component.
 
-Add a property to the thing
+(1) Input: Add a property to the thing
 ```
 property = Property("variable_name", PropertyType.INT, 0)
 thing.add_property(property);
 ```
 
-Add an action to the thing
+(2) Output: Add an action to the thing
 ```
 thing.add_action("sameple_action")
 def custom_function():
@@ -184,7 +186,7 @@ The list of Property instances or the string value of actions' name.
 ### Property
 #### Constructor
 ```
-Property(name, type=0, value=None, range=None, unit=None, description=None)
+Property(name, type=PropertyType.INT, value=None, range=None, unit=None, description=None)
 ```
 The Property() constructor takes the following arguments:  
 **name**  

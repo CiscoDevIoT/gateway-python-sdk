@@ -72,23 +72,12 @@ class Gateway:
         return d
 
     def __register(self):
-        import collections
-        model = collections.OrderedDict([("name", self.name),
-                                         ("kind", self.kind),
-                                         ("mode", self.mode),
-                                         ("owner", self.owner),
-                                         ("host", self.host),
-                                         ("port", self.port),
-                                         ("data", self.data),
-                                         ("action", self.action),
-                                         ("sensors", [thing.get_model() for thing in self.things.values()])])
-        json_string = json.dumps(self.__del_none(model), sort_keys=False)
         try:
             if self.deviot_server.scheme == 'http':
                 conn = httplib.HTTPConnection(self.deviot_server.netloc)
             else:
                 conn = httplib.HTTPSConnection(self.deviot_server.netloc)
-            conn.request("POST", "/api/v1/gateways", json_string, {'Content-Type': 'application/json'})
+            conn.request("POST", "/api/v1/gateways", self.get_model(), {'Content-Type': 'application/json'})
             response = conn.getresponse()
             code = int(response.status)
             if code < 200 or code > 300:
@@ -237,5 +226,17 @@ class Gateway:
         else:
             logger.warn("thing {thing} not registered".format(thing=tid))
 
+    def get_model(self):
+        model = collections.OrderedDict([("name", self.name),
+                                         ("kind", self.kind),
+                                         ("mode", self.mode),
+                                         ("owner", self.owner),
+                                         ("host", self.host),
+                                         ("port", self.port),
+                                         ("data", self.data),
+                                         ("action", self.action),
+                                         ("sensors", [thing.get_model() for thing in self.things.values()])])
+        return json.dumps(self.__del_none(model), sort_keys=False)
+        
     def __str__(self):
         return "{name}({kind})".format(name=self.name, kind=self.kind)

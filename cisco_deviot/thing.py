@@ -14,8 +14,6 @@ import collections
 
 from cisco_deviot import logger
 from enum import EnumMeta
-import constants
-
 
 def default_value_for_type(stype):
     if stype == PropertyType.INT:
