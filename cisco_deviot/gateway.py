@@ -81,6 +81,7 @@ class Gateway:
         try:
             self.__connection.request("POST", "/api/v1/gateways", self.get_model(), {'Content-Type': 'application/json'})
             response = self.__connection.getresponse()
+            response.read()
             code = int(response.status)
             if code < 200 or code > 300:
                 logger.error("failed to register gateway {name} to {server}: {c}-{e}".format(name=self,
@@ -104,6 +105,7 @@ class Gateway:
             try:
                 self.__connection.request("DELETE", "/api/v1/gateways/" + self.name)
                 response = self.__connection.getresponse()
+                response.read()
                 code = int(response.status)
                 if code < 200 or code > 300:
                     logger.error("failed to deregister gateway {name} from {server}: {c}-{e}".format(name=self,

@@ -72,7 +72,7 @@ thing.add_property(property);
 (2) Output: Add an action to the thing
 ```
 thing.add_action("sameple_action")
-def custom_function():
+def custom_function(): ## define your action function
     print("action")
 
 thing.sameple_action = custom_function
@@ -122,7 +122,7 @@ A *Thing* instance to register
 ```
 load(filename, class_directory=None)
 ```
-The load() function registers things from an JSON file named [filename] and the custom Thing-sub classes inside [class_directory].
+The load() function registers things from an JSON file named [filename] and the custom Thing-sub classes inside [class_directory].  
 **filename**  
 The JSON file having information of things. filename should include its extension. The way to write this JSON file is described in **gateway-python-starter-kit**.  
 **class_directory**  
