@@ -78,7 +78,7 @@ class MqttConnector:
         self.__reconnect(2)
 
     def __reconnect(self, backoff):
-        while not self.is_connected():
+        while not self.is_connected() and self.__connection_start:
             logger.info("reconnecting to {server} in {sec} seconds ...".format(server=self, sec=backoff))
             time.sleep(backoff)
             backoff = min(128, backoff * 2)

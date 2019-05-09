@@ -17,6 +17,7 @@ import time
 import json
 import importlib
 import socket
+import collections
 
 from urlparse import urlparse
 from cisco_deviot import logger
@@ -40,10 +41,14 @@ class Gateway:
         if urlparse(deviot_server).scheme == '': # the default protocol for a DevIot server is HTTPS
             deviot_server = "https://" + deviot_server
         self.deviot_server = urlparse(deviot_server)
+        if self.deviot_server.scheme == 'http':
+            self.__connection = httplib.HTTPConnection(self.deviot_server.netloc)
+        else:
+            self.__connection = httplib.HTTPSConnection(self.deviot_server.netloc)
         self.mode = Mode.MQTT
         self.things = {}
         self.__registration_started = False
-        self.__registered = 0
+        self.__registered = False
         if urlparse(connector_server).scheme == '': # the default protocol of MQTT is TCP
             connector_server = "tcp://" + connector_server
         self.connector = MqttConnector(self, connector_server)
@@ -57,7 +62,7 @@ class Gateway:
             time.sleep(2)
             if self.__registration_started:
                 self.__register()
-            time.sleep(8)
+            time.sleep(18)
 
     def __del_none(self, d):
         if isinstance(d, dict):
@@ -71,34 +76,53 @@ class Gateway:
                 self.__del_none(x)
         return d
 
+    # register the gateway to DevIoT server using HTTP(S)
     def __register(self):
         try:
-            if self.deviot_server.scheme == 'http':
-                conn = httplib.HTTPConnection(self.deviot_server.netloc)
-            else:
-                conn = httplib.HTTPSConnection(self.deviot_server.netloc)
-            conn.request("POST", "/api/v1/gateways", self.get_model(), {'Content-Type': 'application/json'})
-            response = conn.getresponse()
+            self.__connection.request("POST", "/api/v1/gateways", self.get_model(), {'Content-Type': 'application/json'})
+            response = self.__connection.getresponse()
             code = int(response.status)
             if code < 200 or code > 300:
-                if self.__registered != 1:
-                    logger.error("failed to register gateway {name} to {server}: {c}-{e}".format(name=self,
-                                                                                             server=self.deviot_server.netloc,
-                                                                                             c=code,
-                                                                                             e=response.reason))
-                self.__registered = 1
+                logger.error("failed to register gateway {name} to {server}: {c}-{e}".format(name=self,
+                                                                                        server=self.deviot_server.netloc,
+                                                                                        c=code,
+                                                                                        e=response.reason))
+                self.__registered = False
             elif not self.__registered:
-                if self.__registered != 2:
-                    logger.info("registered gateway {name} to {server}".format(name=self,
-                                                                           server=self.deviot_server.netloc))
-                self.__registered = 2
+                logger.info("registered gateway {name} to {server}".format(name=self,
+                                                                        server=self.deviot_server.netloc))
+                self.__registered = True
         except IOError as e:
-            if self.__registered != 1:
-                logger.error("failed to register gateway {name} to {server}: {e}".format(name=self,
-                                                                                     server=self.deviot_server.netloc,
-                                                                                     e=e))
-            self.__registered = 1
+            logger.error("failed to register gateway {name} to {server}: {e}".format(name=self,
+                                                                                server=self.deviot_server.netloc,
+                                                                                e=e))
+            self.__registered = False
 
+    # deregister the gateway from DevIoT server
+    def __deregister(self):
+        if self.__registered:
+            try:
+                self.__connection.request("DELETE", "/api/v1/gateways/" + self.name)
+                response = self.__connection.getresponse()
+                code = int(response.status)
+                if code < 200 or code > 300:
+                    logger.error("failed to deregister gateway {name} from {server}: {c}-{e}".format(name=self,
+                                                                                                server=self.deviot_server.netloc,
+                                                                                                c=code,
+                                                                                                e=response.reason))
+                    self.__registered = False
+                elif self.__registered:
+                    logger.info("deregistered gateway {name} from {server}".format(name=self,
+                                                                        server=self.deviot_server.netloc))
+                    self.__registered = False
+            except IOError as e:
+                logger.error("failed to deregister gateway {name} to {server}: {e}".format(name=self,
+                                                                                        server=self.deviot_server.netloc,
+                                                                                        e=e))
+        else:
+            logger.info("gateway {name} has already been deregistered from {server}".format(name=self,
+                                                                                       server=self.deviot_server.netloc))
+        
     def start(self):
         if self.is_started():
             logger.warn("gateway service {name} already started".format(name=self))
@@ -113,6 +137,7 @@ class Gateway:
     def stop(self):
         if self.is_started():
             self.__registration_started = False
+            self.__deregister()
             self.connector.stop()
             logger.info("gateway service {name} stopped".format(name=self))
         else:
@@ -121,6 +146,7 @@ class Gateway:
     def is_started(self):
         return self.__registration_started
 
+    # register things to the gateway
     def register(self, *things):
         for thing in things:
             if not isinstance(thing, Thing):
@@ -162,6 +188,7 @@ class Gateway:
                 instance.options = thing["options"]
             self.register(instance)
 
+    # deregister things from the gateway
     def deregister(self, *things):
         for thing in things:
             if not isinstance(thing, Thing):
