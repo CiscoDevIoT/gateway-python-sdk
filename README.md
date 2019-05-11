@@ -10,7 +10,7 @@ You can use this SDK to register devices to DevIoT and sync up data and actions 
 * [API](#api)
 
 ## Requirement
-1. [Python 2.7](https://www.python.org/downloads/): This SDK is based on the Python 2.7.3
+1. [Python](https://www.python.org/downloads/): This SDK is written in Python. We support both Python 2 and 3.
 2. [paho-mqtt](https://eclipse.org/paho/clients/python/): This SDK uses this library to build a MQTT client
 
 ## Usage
@@ -26,10 +26,13 @@ You can use this SDK to register devices to DevIoT and sync up data and actions 
 
 ## Getting Started
 #### 0) Check the version of python (terminal)
-In order to use this SDK, the version of python should be 2.x. You can check it with the following command.
+Before using this SDK, you need to check the version of python. The master branch is written in **Python 2**. You can check it with the following command.
 ```
 python --version
 ```
+
+If your python version is 3.x, you need to switch to 'python3' branch in the next step.
+
 
 #### 1) Set up SDK package (terminal)
 Clone SDK git repository
@@ -37,7 +40,13 @@ Clone SDK git repository
 git clone https://github.com/ailuropoda0/gateway-python-sdk.git
 cd gateway-python-sdk
 ```
-install sdk package on python 2 
+(**ONLY for Python 3 users**) Switch to Python 3 
+```
+git fetch origin python3:python3
+git checkout python3
+```
+
+Install sdk package on python
 ```
 python setup.py install
 ```
