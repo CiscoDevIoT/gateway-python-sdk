@@ -13,29 +13,33 @@
 import collections
 
 from cisco_deviot import logger
-
-PropertyTypeInt = 0
-PropertyTypeString = 1
-PropertyTypeBool = 2
-PropertyTypeColor = 3
-
+from enum import EnumMeta
 
 def default_value_for_type(stype):
-    if stype == PropertyTypeInt:
+    if stype == PropertyType.INT:
         return 0
-    if stype == PropertyTypeBool:
+    if stype == PropertyType.BOOL:
         return False
-    if stype == PropertyTypeString:
+    if stype == PropertyType.STRING:
         return ""
-    if stype == PropertyTypeColor:
+    if stype == PropertyType.COLOR:
         return "FFFFFF"
     return None
 
 
+class PropertyType(EnumMeta):
+    INT = 0
+    STRING = 1
+    BOOL = 2
+    COLOR = 3
+
+
 class Property:
-    def __init__(self, name, type=0, value=None, range=None, unit=None, description=None):
+    def __init__(self, name, type=PropertyType.INT, value=None, range=None, unit=None, description=None):
         self.name = name
         self.type = type
+        if value is None:
+            value = default_value_for_type(type)
         self.value = value
         self.range = range
         self.unit = unit
@@ -48,6 +52,9 @@ class Property:
                                         ("value", self.value),
                                         ("unit", self.unit),
                                         ("description", self.description)])
+
+    def __str__(self):
+        return "{name}:{value}{unit}".format(name=self.name, value=self.value, unit=self.unit)
 
 
 class Action:
@@ -88,17 +95,35 @@ class Thing:
     def __str__(self):
         return "{id}.{name}({kind})".format(id=self.id, name=self.name, kind=self.kind)
 
+    def get_data(self):
+        return {prop.name: prop.value for prop in self.properties}
+
+    # check the property, of which name is 'prop', is in properies
+    def _has_property(self, prop):
+        return (prop in [property.name for property in self.properties])
+
     def add_property(self, *thing_properties):
-        for prop in thing_properties:
-            if isinstance(prop, str):
-                self.properties.append(Property(prop, PropertyTypeInt))
-            elif isinstance(prop, Property):
-                self.properties.append(prop)
+        for property in thing_properties: 
+            if isinstance(property, str):
+                added_property = Property(property)
+            elif isinstance(property, Property):
+                added_property = property
             else:
-                logger.error(
-                    "invalid property {property}, only string and Property are supported".format(property=prop))
+                logger.error("invalid property {property}, only string and Property are supported".format(property=property))
+                continue
+            if self._has_property(added_property.name):
+                logger.error("Invalid property name {property}, already registered.".format(property=added_property.name))
+                break
+            self.properties.append(property)
 
         return self
+
+    def update_property(self, **new_properties):
+        for new_prop_name in new_properties:
+            for existing_prop in self.properties:
+                if new_prop_name == existing_prop.name:
+                    existing_prop.value = new_properties[new_prop_name]
+                    break
 
     def add_action(self, *thing_actions):
         for act in thing_actions:
@@ -107,9 +132,10 @@ class Thing:
             elif isinstance(act, Action):
                 self.actions.append(act)
             else:
-                logger.error("invalid property {property}, only string and Property are supported".format(property=act))
+                logger.error("invalid action {action}, only string and Action are supported".format(action=act))
         return self
 
+    # method: action name
     def call_action(self, method, args):
         action_method = getattr(self, method)
         matches = list(a for a in self.actions if a.name == method)

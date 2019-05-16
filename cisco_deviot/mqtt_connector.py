@@ -12,6 +12,7 @@
 
 
 import json
+import threading
 from urlparse import urlparse
 
 import time
@@ -28,6 +29,7 @@ class MqttConnector:
         self.client.on_disconnect = self.__on_disconnect__
         self.client.on_message = self.__on_message__
         self.__connected = False
+        self.__connection_start = False
         ns = gateway.owner.replace("@", "_").replace(".", "_").replace("/", "_")
         if ns == "":
             ns = "_"
@@ -36,18 +38,36 @@ class MqttConnector:
         surl = urlparse(mqtt_server)
         self.host = surl.hostname
         self.port = surl.port
+        if self.port is None: # The default MQTT port number is 1883
+            self.port = 1883
         self.data = "/deviot/{ns}/{name}/data".format(name=name, ns=ns)
         self.action = "/deviot/{ns}/{name}/action".format(name=name, ns=ns)
+
+    def __publish_function(self):
+        while self.__connection_start:
+            if self.is_connected():
+                data = self.gateway.get_data()
+                if len(data) != 0:
+                    self.publish(data)
+            time.sleep(0.5)
 
     def start(self):
         self.client.connect_async(self.host, self.port, 60)
         self.client.loop_start()
+        self.__connection_start = True
+        thread = threading.Thread(target=MqttConnector.__publish_function, args=(self,))
+        thread.daemon = True
+        thread.start()
         logger.info("connecting to {server} ...".format(server=self))
 
     def stop(self):
+        self.__connection_start = False
         self.client.disconnect()
 
     def __on_connect__(self, client, userdata, flags, rc):
+        if rc != 0:
+            logger.error("mqtt connection bad returned code={code}".format(code=rc))
+            self.__reconnect(2)
         self.client.subscribe(self.action)
         self.__connected = True
         logger.info("{server}{topic} connected".format(server=self, topic=self.action))
@@ -55,8 +75,10 @@ class MqttConnector:
     def __on_disconnect__(self, client, userdata, rc):
         logger.warn("{server} disconnected".format(server=self))
         self.__connected = False
-        backoff = 2
-        while not self.__connected:
+        self.__reconnect(2)
+
+    def __reconnect(self, backoff):
+        while not self.is_connected() and self.__connection_start:
             logger.info("reconnecting to {server} in {sec} seconds ...".format(server=self, sec=backoff))
             time.sleep(backoff)
             backoff = min(128, backoff * 2)
@@ -74,7 +96,7 @@ class MqttConnector:
         try:
             args = json.loads(message)
             self.gateway.call_action(args)
-        except Exception, error:
+        except Exception as error:
             logger.error("failed to process message {message}: {error}".format(message=message, error=error))
 
     def publish(self, data):

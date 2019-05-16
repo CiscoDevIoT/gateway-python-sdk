@@ -20,13 +20,13 @@ setup(
     name = "cisco_deviot",
     version = "0.1.2",
     description = "Gateway SDK for Cisco DevIoT",
-    long_description=long_description,
-    url="https://github.com/CiscoDevIoT/gateway-python-sdk",
+    long_description = long_description,
+    url = "https://github.com/CiscoDevIoT/gateway-python-sdk",
     author = "Haihua Xiao",
     author_email = "hhxiao@gmail.com",
     license = "Apache 2.0",
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
-    classifiers=[
+    classifiers = [
         # How mature is this project? Common values are
         #   3 - Alpha
         #   4 - Beta
@@ -50,8 +50,8 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
     # What does your project relate to?
-    keywords='cisco devnet deviot gateway',
+    keywords = 'cisco devnet deviot gateway',
     zip_safe = False,
     packages = find_packages(),
-    install_requires=['paho-mqtt'],
-    )
+    install_requires = ['paho-mqtt'],
+)
