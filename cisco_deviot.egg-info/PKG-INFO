@@ -10,12 +10,11 @@ Description: # gateway-python-sdk
         
         ### Python SDK for DevIoT service ([https://deviot.cisco.com/](https://deviot.cisco.com/))
         
-        You can use this SDK to register devices to DevIoT, and sync up data and actions between the devices and DevIoT.
+        You can use this SDK to register devices to DevIoT and sync up data and actions between the devices and DevIoT.
         
         ## Table of contents
         
         * [Getting Started](#getting-started)
-        * [Run sample code on Raspberry Pi](#run-sample-code-on-raspberry-pi)
         * [API](#api)
         
         ## Requirement
@@ -23,8 +22,8 @@ Description: # gateway-python-sdk
         2. [paho-mqtt](https://eclipse.org/paho/clients/python/): This SDK uses this library to build a MQTT client
         
         ## Usage
-        1. You can use sample code to register GrovePi sensors and simulated sensors to DevIoT.
-        2. You can also use SDK to register other sensors and systems to DevIoT.
+        1. You can use SDK to register your own sensors and systems to DevIoT.
+        2. Use [Starter-ki](https://wwwin-github.cisco.com/DevIoT/gateway-python-starter-kit) to run sample codes
         
         ## Term
         
@@ -43,8 +42,8 @@ Description: # gateway-python-sdk
         #### 1) Set up SDK package (terminal)
         Clone SDK git repository
         ```
-        git clone https://wwwin-github.cisco.com/DevIoT/gateway-python-sdk.git
-        cd gateway-pythohn-sdk
+        git clone https://github.com/ailuropoda0/gateway-python-sdk.git
+        cd gateway-python-sdk
         ```
         install sdk package on python 2 
         ```
@@ -52,34 +51,36 @@ Description: # gateway-python-sdk
         ```
         
         #### 2) Connect gateway (python code)
+        You can refer the example code in [gateway-python-starter-kit](https://wwwin-github.cisco.com/DevIoT/gateway-python-starter-kit).
+        
         Import SDK
         ```
         from cisco_deviot.gateway import Gateway
-        from cisco_deviot.thing import Thing
-        from cisco_deviot.thing import Property
-        import constants
+        from cisco_deviot.thing import Thing, Property, PropertyType
         ```
         Construct a Gateway object
         ```
-        account = "your_id@cisco.com"
-        app = Gateway("gateway_name", "deviot.cisco.com", "deviot.cisco.com:18883", "device", account)
+        account = "your_id@cisco.com" # enter your DevIoT account
+        app = Gateway(name="gateway_name", account=account)
         ```
         
         Contruct a thing instance
         ```
         thing = Thing("thing-id", "thing-name", "thing-kind")
         ```
+        You can only use Thing as either an input component(sensor) or an output component.
+        If your thing has both properties and actions, it acts as an input component.
         
-        Add a property to the thing
+        (1) Input: Add a property to the thing
         ```
-        property = Property("variable_name", constants.PROPERTY_TYPE_INT, 0)
+        property = Property("variable_name", PropertyType.INT, 0)
         thing.add_property(property);
         ```
         
-        Add an action to the thing
+        (2) Output: Add an action to the thing
         ```
         thing.add_action("sameple_action")
-        def custom_function():
+        def custom_function(): ## define your action function
             print("action")
         
         thing.sameple_action = custom_function
@@ -105,15 +106,15 @@ Description: # gateway-python-sdk
         ### Gateway
         #### Constructor
         ```
-        Gateway(name, deviot_server, connector_server, kind="device", account="")
+        Gateway(name, deviot_server="deviot.cisco.com", connector_server="deviot.cisco.com:18883", kind="device", account="")
         ```
         The Gateway() constructor takes the following arguments:  
         **name**  
         The unique name of a gateway  
         **deviot_server**  
-        The address for the DevIoT server. It does not need to add the protocol. The default protocol is HTTPS(secure connection). The public DevIoT server address is 'deviot.cisco.com'  
+        The address for the DevIoT server. The default value is 'deviot.cisco.com'. It does not need to add the protocol. The default protocol is HTTPS(secure connection).  
         **connector_server**  
-        The address for the MQTT server. It does not need to add the protcol. The default protocol is TCP(unsecure connection) and the default port number is 1883. The public MQTT server address is 'deviot.cisco.com:18883'  
+        The address for the MQTT server. The default value is 'deviot.cisco.com:18883'. It does not need to add the protcol. The default protocol is TCP(unsecure connection) and the default port number is 1883.  
         **kind**  
         The kind of a gateway  
         **account**  
@@ -122,15 +123,25 @@ Description: # gateway-python-sdk
         ```
         register(*things)
         ```
-        The register() function adds things to the gateway. The thing should not have been already registered.
+        The register() function adds things to the gateway. The thing should not have been already registered.  
         **thing**  
         A *Thing* instance to register
+        #### load()
+        ```
+        load(filename, class_directory=None)
+        ```
+        The load() function registers things from an JSON file named [filename] and the custom Thing-sub classes inside [class_directory].
+        **filename**  
+        The JSON file having information of things. filename should include its extension. The way to write this JSON file is described in **gateway-python-starter-kit**.  
+        **class_directory**  
+        The directory which has custom Thing-sub class. If the Thing-sub class is defined in the same directory, class_directory should be omitted or be None.
+        
         #### deregister()
         ```
         deregister(*things)
         ```
         The deregister() function deletes things from the gateway.  
-        **thing**  
+        **\*things**  
         A *Thing* instance to deregister
         #### update_thing()
         ```
@@ -183,13 +194,13 @@ Description: # gateway-python-sdk
         ### Property
         #### Constructor
         ```
-        Property(name, type=0, value=None, range=None, unit=None, description=None)
+        Property(name, type=PropertyType.INT, value=None, range=None, unit=None, description=None)
         ```
         The Property() constructor takes the following arguments:  
         **name**  
         The name of a property. It should be unique in a thing.  
         **type**  
-        The variable type of a property. There are 4 types: int, bool, string, color. You can use constants.PROPERTY_TYPE_INT, constants.PROPERTY_TYPE_BOOL, constants.PROPERTY_TYPE_STRING, constants.PROPERTY_TYPE_COLOR after importing constants.  
+        The variable type of a property. There are 4 types: int, bool, string, color. You can use PropertyType.INT, PropertyType.BOOL, PropertyType.STRING, PropertyType.COLOR after importing 'PropertyType' class from 'cisco_deviot.thing'.  
         **value**  
         The value of a property.  
         **range**  
@@ -198,6 +209,25 @@ Description: # gateway-python-sdk
         The unit of a property. It is string value.  
         **description**  
         The description for a property. It is shown at the page of each thing.
+        
+        ### Action
+        #### Constructor
+        ```
+        Action(name, **kwargs)
+        ```
+        The Action() constructor takes the following arguments:  
+        **name**  
+        The name of Action. The method with the same name should be defined in a class or an instance. So the name must not overlap with other methods of Thing class like *add_property* and *add_action, and the name cannot contain space ' '.  
+        **\*\*kwargs**  
+        The keyword arguments for properties in an action. Key is the name of a property and the value of the property. It is not mandatory.
+        
+        #### add_parameter()
+        ```
+        add_parameter(action_parameter)
+        ```
+        The *add_parameter* adds properties to an Action instance.  
+        **action_parameter**  
+        A Property instance to be added
         
 Keywords: cisco devnet deviot gateway
 Platform: UNKNOWN

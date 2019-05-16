@@ -11,18 +11,18 @@ You can use this SDK to register devices to DevIoT and sync up data and actions 
 
 ## Requirement
 1. [Python](https://www.python.org/downloads/): This SDK is written in Python. We support both Python 2 and 3.
-2. [paho-mqtt](https://eclipse.org/paho/clients/python/): This SDK uses this library to build a MQTT client
+2. [paho-mqtt](https://eclipse.org/paho/clients/python/): This SDK uses this library to build an MQTT client
 
 ## Usage
 1. You can use SDK to register your own sensors and systems to DevIoT.
-2. Use [Starter-ki](https://wwwin-github.cisco.com/DevIoT/gateway-python-starter-kit) to run sample codes
+2. Use [Starter-kit](https://wwwin-github.cisco.com/DevIoT/gateway-python-starter-kit) to run sample codes
 
 ## Term
 
 - **Gateway**: 'Gateway' is a device connected to DevIoT like a Raspberry Pi board or a mobile phone
 - **Thing**: 'Thing' is a sensor or a module in a gateway like a light sensor, LED, or GPS. A thing is an icon in DevIoT. A gateway can have several things.
 - **Property**: 'Property' is a variable measured by a thing. For instance, Latitude and longitude are properties of a GPS. A thing can have several properties.
-- **Action**: 'Action' is a command for a module. For example, turning on and off LED are two different actions. A thing can have several actions.
+- **Action**: 'Action' is a command for a module. For example, turning on and off LED is two different actions. A thing can have several actions.
 
 ## Getting Started
 #### 0) Check the version of python (terminal)
@@ -46,7 +46,7 @@ git fetch origin python3:python3
 git checkout python3
 ```
 
-Install sdk package on python
+Install SDK package on python
 ```
 python setup.py install
 ```
@@ -65,12 +65,13 @@ account = "your_id@cisco.com" # enter your DevIoT account
 app = Gateway(name="gateway_name", account=account)
 ```
 
-Contruct a thing instance
+Construct a Thing instance
 ```
 thing = Thing("thing-id", "thing-name", "thing-kind")
 ```
-You can only use Thing as either an input component(sensor) or an output component.
-If your thing has both properties and actions, it acts as an input component.
+A Thing instance can have both *properties* and *actions*. But you can only use it as *either* an input component *or* an output component in each project.
+
+In DevIoT project page, click the 'Connect' button and connect the thing component with a rules engine by double-clicking them. The type of the component is determined by which component is first double-clicked between the thing component (input) and the rules engine (output).
 
 (1) Input: Add a property to the thing
 ```
